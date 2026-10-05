@@ -21,7 +21,7 @@ jobs:
 
       - name: Levantar la aplicación con Docker Compose
         run: |
-          docker-compose up -d
+          docker compose up -d
           # Esperar unos segundos a que el contenedor de Express inicie correctamente
           sleep 5
 
