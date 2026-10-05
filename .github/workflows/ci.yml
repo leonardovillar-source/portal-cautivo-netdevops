@@ -39,11 +39,13 @@ jobs:
 
       - name: Instalar k6 (Pruebas de Carga)
         run: |
-          sudo gpg -k
-          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C047C0FA5A
-          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
           sudo apt-get update
-          sudo apt-get install k6
+          sudo apt-get install -y gpg
+          sudo mkdir -p /etc/apt/keyrings
+          curl -fsSL https://dl.k6.io/key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/k6.gpg
+          echo "deb [signed-by=/etc/apt/keyrings/k6.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install -y k6
 
       - name: Ejecutar Pruebas de Carga (k6)
         run: k6 run tests-performance/load-test.js
