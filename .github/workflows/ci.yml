@@ -1,4 +1,4 @@
-name: Pipeline QA & NetDevOps
+name: CI NetDevOps Portal Cautivo
 
 on:
   push:
@@ -17,22 +17,27 @@ jobs:
       - name: Configurar Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
-          check-latest: true
+          node-version: '20'
 
       - name: Levantar la aplicación con Docker Compose
-        run: docker compose up -d --build
+        run: |
+          docker-compose up -d
+          # Esperar unos segundos a que el contenedor de Express inicie correctamente
+          sleep 5
 
       - name: Instalar dependencias de pruebas E2E
         working-directory: ./tests-e2e
-        run: npm ci
+        run: npm install
+
+      - name: Instalar navegadores de Playwright
+        working-directory: ./tests-e2e
+        run: npx playwright install --with-deps
 
       - name: Ejecutar Pruebas E2E (Playwright)
         working-directory: ./tests-e2e
-        run: |
-          npx playwright install --with-deps chromium
-          npx playwright test
+        run: npx playwright test
 
       - name: Ejecutar Pruebas de Carga (k6)
-        run: |
-          docker run --rm -i grafana/k6 run - < tests-performance/load-test.js
+        uses: k6io/action@v0.5.0
+        with:
+          filename: tests-performance/load-test.js
