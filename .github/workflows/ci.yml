@@ -37,7 +37,13 @@ jobs:
         working-directory: ./tests-e2e
         run: npx playwright test
 
+      - name: Instalar k6 (Pruebas de Carga)
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C047C0FA5A
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+
       - name: Ejecutar Pruebas de Carga (k6)
-        uses: k6io/action@v0.5.0
-        with:
-          filename: tests-performance/load-test.js
+        run: k6 run tests-performance/load-test.js
